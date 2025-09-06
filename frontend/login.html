@@ -1,0 +1,105 @@
+<!-- frontend/login.html — Role-aware DEV-ONLY login page for prototype -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prototype Login — DEV ONLY</title>
+    <style>
+      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;background:#f6f7f9;margin:0}
+      .card{max-width:640px;margin:48px auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.06)}
+      .pad{padding:24px}
+      .row{display:flex;gap:12px}
+      label{display:block;font-size:12px;color:#4b5563;margin-bottom:6px}
+      input{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:8px}
+      button{cursor:pointer;border:0;border-radius:8px;padding:10px 14px;background:#059669;color:#fff}
+      .muted{color:#6b7280;font-size:12px}
+      .danger{color:#b91c1c}
+      .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+      .outline{background:#fff;color:#111827;border:1px solid #d1d5db}
+      .title{font-weight:700;font-size:20px;margin:0 0 8px}
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="pad">
+        <h1 class="title">Prototype Login (DEV ONLY)</h1>
+        <p class="muted">Plain-text credentials. No security. Do not use in production.</p>
+      </div>
+      <div class="pad">
+        <form id="loginForm">
+          <div class="row">
+            <div style="flex:1">
+              <label>Phone (plain text)</label>
+              <input id="phone" placeholder="e.g., 9990001111" required />
+            </div>
+            <div style="flex:1">
+              <label>Password (plain text)</label>
+              <input id="password" type="password" placeholder="password" required />
+            </div>
+          </div>
+          <div class="row" style="justify-content:space-between;align-items:center;margin-top:16px">
+            <div class="muted">DOB for all: 2007-09-06 • DEV ONLY</div>
+            <button type="submit">Login</button>
+          </div>
+        </form>
+        <div id="error" class="muted danger" style="margin-top:8px;display:none"></div>
+      </div>
+      <div class="pad">
+        <div class="muted" style="margin-bottom:8px">Quick login</div>
+        <div class="grid">
+          <button class="outline" data-q="aditya">Aditya (admin)</button>
+          <button class="outline" data-q="kislaya">Kislaya (practitioner)</button>
+          <button class="outline" data-q="shivani">Shivani (patient)</button>
+        </div>
+      </div>
+      <div class="pad">
+        <p class="muted">Storage: JSON files in /data. For full persistence actions (create/cancel/escalate), run server with CGI enabled.</p>
+      </div>
+    </div>
+
+    <script type="module">
+      async function loadUsers(){
+        const res = await fetch('../data/users.json', {cache:'no-store'});
+        if(!res.ok) throw new Error('Failed to load users.json');
+        return res.json();
+      }
+
+      function saveCurrentUser(u){
+        localStorage.setItem('currentUser', JSON.stringify(u));
+      }
+
+      function goDash(){
+        location.href = './dashboard.html';
+      }
+
+      document.querySelectorAll('[data-q]').forEach(btn=>{
+        btn.addEventListener('click', async () => {
+          const key = btn.getAttribute('data-q');
+          const users = await loadUsers();
+          const map = { aditya:'9990001111', kislaya:'9990002222', shivani:'9990003333' };
+          const phones = map[key];
+          const user = users.find(u=>u.phone===phones);
+          if(user){ saveCurrentUser(user); goDash(); }
+        });
+      });
+
+      document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const phone = (document.getElementById('phone').value||'').trim();
+        const pwd = document.getElementById('password').value;
+        try{
+          const users = await loadUsers();
+          const u = users.find(x=>x.phone===phone && x.password===pwd && !x.is_deleted);
+          if(!u){ throw new Error('Invalid phone or password'); }
+          saveCurrentUser(u);
+          goDash();
+        }catch(err){
+          const el = document.getElementById('error');
+          el.textContent = err.message || 'Login failed';
+          el.style.display = 'block';
+        }
+      });
+    </script>
+  </body>
+  </html>

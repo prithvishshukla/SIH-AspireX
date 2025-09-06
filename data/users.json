@@ -1,0 +1,32 @@
+[
+  {
+    "user_id": "u_aditya_admin",
+    "name": "Aditya",
+    "role": "admin",
+    "dob": "2007-09-06",
+    "phone": "9990001111",
+    "aadhar": "111122223333",
+    "password": "admin123",
+    "is_deleted": false
+  },
+  {
+    "user_id": "u_kislaya_pract",
+    "name": "Kislaya",
+    "role": "practitioner",
+    "dob": "2007-09-06",
+    "phone": "9990002222",
+    "aadhar": "222233334444",
+    "password": "pract123",
+    "is_deleted": false
+  },
+  {
+    "user_id": "u_shivani_patient",
+    "name": "Shivani",
+    "role": "patient",
+    "dob": "2007-09-06",
+    "phone": "9990003333",
+    "aadhar": "333344445555",
+    "password": "patient123",
+    "is_deleted": false
+  }
+]

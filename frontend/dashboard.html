@@ -1,0 +1,175 @@
+<!-- frontend/dashboard.html — Role-aware dashboard for prototype -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prototype Dashboard — DEV ONLY</title>
+    <style>
+      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;background:#f6f7f9;margin:0}
+      .wrap{max-width:960px;margin:24px auto;padding:0 12px}
+      .row{display:flex;gap:12px;align-items:flex-start}
+      .col{flex:1}
+      .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.06)}
+      .pad{padding:16px}
+      h2{margin:0 0 8px}
+      input,select,textarea{width:100%;padding:8px;border:1px solid #d1d5db;border-radius:8px}
+      button{cursor:pointer;border:0;border-radius:8px;padding:8px 12px;background:#059669;color:#fff}
+      table{width:100%;border-collapse:collapse}
+      th,td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left;font-size:14px}
+      .muted{color:#6b7280;font-size:12px}
+      .danger{background:#ef4444}
+      .outline{background:#fff;color:#111827;border:1px solid #d1d5db}
+      .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
+      .chip-pending{background:#fef3c7;color:#92400e}
+      .chip-cancelled{background:#fee2e2;color:#991b1b}
+      .chip-confirmed{background:#dcfce7;color:#065f46}
+      .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card pad">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h2>Dashboard — <span id="role"></span></h2>
+            <div class="muted">Prototype only — plain text data, no security</div>
+          </div>
+          <div class="toolbar">
+            <button id="impersonate" class="outline">Impersonate…</button>
+            <button id="logout" class="danger">Logout</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <div class="col card pad">
+          <h3>Appointments</h3>
+          <div id="apptControls" class="toolbar" style="margin-bottom:8px"></div>
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Patient</th><th>Practitioner</th><th>Scheduled</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="appts"></tbody>
+          </table>
+        </div>
+        <div class="col card pad">
+          <h3>Action Log</h3>
+          <div id="log" class="muted" style="white-space:pre-wrap"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      const API = '../cgi-bin/api.py';
+      const $ = sel => document.querySelector(sel);
+      const log = (m) => { const el=$('#log'); el.textContent += `\n${new Date().toLocaleTimeString()} - ${m}`; };
+      const currentUser = JSON.parse(localStorage.getItem('currentUser')||'null');
+      if(!currentUser){ location.href='./login.html'; }
+      $('#role').textContent = `${currentUser.name} — ${currentUser.role}`;
+
+      async function getUsers(){ const r=await fetch('../data/users.json',{cache:'no-store'}); return r.json(); }
+      async function listAppts(){ const r=await fetch(`${API}?action=list_appointments`,{cache:'no-store'}); return r.json(); }
+      async function adminLog(actor, action, target, meta={}){
+        await fetch(`${API}?action=admin_action`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor,action,target,meta})});
+      }
+      async function createAppt(payload){
+        const r = await fetch(`${API}?action=create_appointment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+        return r.json();
+      }
+      async function cancelAppt(appointment_id, by, reason){
+        const r = await fetch(`${API}?action=cancel_appointment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({appointment_id, by, reason})});
+        return r.json();
+      }
+      async function escalateAppt(appointment_id, escalated_to, reason){
+        const r = await fetch(`${API}?action=escalate_appointment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({appointment_id, escalated_to, reason})});
+        return r.json();
+      }
+
+      function chip(status){
+        const m = {pending:'chip chip-pending', cancelled:'chip chip-cancelled', confirmed:'chip chip-confirmed'};
+        return `<span class="${m[status]||'chip'}">${status}</span>`;
+      }
+
+      async function render(){
+        const [users, appts] = await Promise.all([getUsers(), listAppts()]);
+        const uById = Object.fromEntries(users.map(u=>[u.user_id,u]));
+        const tb = $('#appts');
+        tb.innerHTML = '';
+        const canAdmin = currentUser.role==='admin';
+        const canPract = currentUser.role==='practitioner';
+        const canPatient = currentUser.role==='patient';
+
+        const filtered = appts.filter(a=>{
+          if(canAdmin) return true;
+          if(canPract) return a.practitioner_id===currentUser.user_id;
+          if(canPatient) return a.patient_id===currentUser.user_id;
+          return false;
+        });
+
+        for(const a of filtered){
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${a.appointment_id}</td>
+            <td>${uById[a.patient_id]?.name||a.patient_id}</td>
+            <td>${uById[a.practitioner_id]?.name||a.practitioner_id}</td>
+            <td>${a.scheduled_at}</td>
+            <td>${chip(a.status)}</td>
+            <td></td>`;
+          const actions = document.createElement('div');
+          // Cancel rights
+          if(canAdmin || (canPatient && a.patient_id===currentUser.user_id)){
+            const b = document.createElement('button'); b.className='outline'; b.textContent='Cancel';
+            b.onclick = async ()=>{ await cancelAppt(a.appointment_id, currentUser.user_id, 'demo-cancel'); log(`Cancelled ${a.appointment_id}`); if(canAdmin) await adminLog(currentUser.user_id,'cancel',a.appointment_id); render(); };
+            actions.appendChild(b);
+          }
+          // Escalate rights
+          if(canAdmin || canPract){
+            const b = document.createElement('button'); b.className='outline'; b.textContent='Escalate';
+            b.onclick = async ()=>{ await escalateAppt(a.appointment_id, 'medical_director', 'demo-escalation'); log(`Escalated ${a.appointment_id}`); if(canAdmin) await adminLog(currentUser.user_id,'escalate',a.appointment_id); render(); };
+            actions.appendChild(b);
+          }
+          tr.lastElementChild.appendChild(actions);
+          tb.appendChild(tr);
+        }
+
+        // Controls per role
+        const ctrl = $('#apptControls');
+        ctrl.innerHTML='';
+        if(canPatient){
+          const f = document.createElement('div');
+          f.innerHTML = `
+            <input id="dt" type="datetime-local" />
+            <select id="prac"></select>
+            <button id="create">Create</button>
+          `;
+          ctrl.appendChild(f);
+          const prac = $('#prac');
+          users.filter(u=>u.role==='practitioner' && !u.is_deleted).forEach(u=>{
+            const o = document.createElement('option'); o.value=u.user_id; o.textContent=u.name; prac.appendChild(o);
+          });
+          $('#create').onclick = async ()=>{
+            const dt = $('#dt').value; const pid = currentUser.user_id; const pracId = $('#prac').value;
+            const id = 'a_'+Math.random().toString(36).slice(2,10);
+            await createAppt({ appointment_id:id, patient_id:pid, practitioner_id:pracId, scheduled_at:dt, created_by:pid });
+            log(`Created ${id}`); render();
+          };
+        }
+      }
+
+      // Impersonate (admin only)
+      $('#impersonate').onclick = async ()=>{
+        const users = await getUsers();
+        const names = users.map(u=>`${u.name} (${u.role})`).join('\n');
+        const pick = prompt(`Impersonate:\n${names}\nEnter phone:`);
+        if(!pick) return;
+        const found = users.find(u=>u.phone===pick || u.name===pick);
+        if(found){ localStorage.setItem('currentUser', JSON.stringify(found)); await adminLog(currentUser.user_id,'impersonate',found.user_id); location.reload(); }
+      };
+
+      $('#logout').onclick = ()=>{ localStorage.removeItem('currentUser'); location.href='./login.html'; };
+
+      render();
+    </script>
+  </body>
+  </html>

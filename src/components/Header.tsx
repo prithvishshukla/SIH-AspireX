@@ -1,13 +1,16 @@
 import React from 'react';
-import { Leaf, Bell, User, Calendar, BarChart3, Settings } from 'lucide-react';
+import { Leaf, Bell, User, Calendar, BarChart3 } from 'lucide-react';
+
+type ViewType = 'home' | 'dashboard' | 'scheduling' | 'tracking' | 'notifications' | 'analytics' | 'profile';
+type UserRole = 'patient' | 'practitioner' | 'admin';
 
 interface HeaderProps {
-  currentView: string;
-  setCurrentView: (view: string) => void;
-  userRole: 'patient' | 'practitioner' | 'admin';
-  setUserRole: (role: 'patient' | 'practitioner' | 'admin') => void;
+  currentView: ViewType;
+  setCurrentView: React.Dispatch<React.SetStateAction<ViewType>>;
+  userRole: UserRole;
+  setUserRole: React.Dispatch<React.SetStateAction<UserRole>>;
   isAuthenticated: boolean;
-  setIsAuthenticated: (auth: boolean) => void;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -55,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setCurrentView(item.id)}
+                    onClick={() => setCurrentView(item.id as ViewType)}
                     className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       currentView === item.id
                         ? 'bg-emerald-100 text-emerald-700 shadow-sm'

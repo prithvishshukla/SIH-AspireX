@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Calendar, Clock, User, MapPin, Plus, Filter, Search } from 'lucide-react';
+import { bookingService, type Booking } from '../services/bookings';
 
 interface TherapySchedulingProps {
   userRole: 'patient' | 'practitioner' | 'admin';
 }
 
 export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }) => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedTherapy, setSelectedTherapy] = useState('');
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [note, setNote] = useState('');
 
   const therapyTypes = [
     { id: 'abhyanga', name: 'Abhyanga Massage', duration: '90 min', price: '₹3,500' },
@@ -22,35 +25,35 @@ export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }
     '9:00 AM', '10:30 AM', '12:00 PM', '1:30 PM', '3:00 PM', '4:30 PM', '6:00 PM'
   ];
 
-  const upcomingAppointments = [
-    {
-      id: 1,
-      date: '2025-01-10',
-      time: '2:00 PM',
-      therapy: 'Abhyanga Massage',
-      practitioner: 'Dr. Priya Sharma',
-      status: 'confirmed',
-      patient: userRole === 'practitioner' ? 'Sarah Johnson' : undefined
-    },
-    {
-      id: 2,
-      date: '2025-01-12',
-      time: '10:00 AM',
-      therapy: 'Shirodhara',
-      practitioner: 'Dr. Rajesh Kumar',
+  // Load bookings from storage
+  const upcomingAppointments = useMemo(() => bookingService.getAll(), []);
+
+  const submitBooking = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTherapy || !selectedDate || !selectedTime) return;
+    const therapy = therapyTypes.find(t => t.id === selectedTherapy);
+    if (!therapy) return;
+    const newBooking: Booking = {
+      id: crypto.randomUUID(),
+      date: selectedDate,
+      time: selectedTime,
+      therapyId: therapy.id,
+      therapyName: therapy.name,
+      practitioner: 'TBD Practitioner',
       status: 'pending',
-      patient: userRole === 'practitioner' ? 'Michael Chen' : undefined
-    },
-    {
-      id: 3,
-      date: '2025-01-15',
-      time: '4:00 PM',
-      therapy: 'Nasya Therapy',
-      practitioner: 'Dr. Priya Sharma',
-      status: 'confirmed',
-      patient: userRole === 'practitioner' ? 'Lisa Williams' : undefined
-    }
-  ];
+      patient: userRole === 'practitioner' ? 'TBD Patient' : undefined,
+      notes: note || undefined,
+    };
+    bookingService.add(newBooking);
+    // Reset and close
+    setSelectedDate('');
+    setSelectedTime('');
+    setSelectedTherapy('');
+    setNote('');
+    setShowBookingModal(false);
+    // Force a refresh by replacing location (simple approach without global state)
+    if (typeof window !== 'undefined') window.location.reload();
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8">
@@ -137,7 +140,12 @@ export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }
                 {timeSlots.map((time) => (
                   <button
                     key={time}
-                    className="p-3 border border-gray-200 rounded-lg text-center hover:bg-emerald-50 hover:border-emerald-300 transition-colors"
+                    onClick={() => setSelectedTime(time)}
+                    className={`p-3 border rounded-lg text-center transition-colors ${
+                      selectedTime === time
+                        ? 'bg-emerald-50 border-emerald-300'
+                        : 'border-gray-200 hover:bg-emerald-50 hover:border-emerald-300'
+                    }`}
                   >
                     <div className="font-medium text-gray-900">{time}</div>
                     <div className="text-xs text-emerald-600">Available</div>
@@ -159,7 +167,7 @@ export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }
               {upcomingAppointments.map((appointment) => (
                 <div key={appointment.id} className="border border-gray-100 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-gray-900">{appointment.therapy}</h4>
+                    <h4 className="font-semibold text-gray-900">{appointment.therapyName}</h4>
                     <span className={`text-xs px-2 py-1 rounded-full ${
                       appointment.status === 'confirmed' 
                         ? 'bg-emerald-100 text-emerald-700' 
@@ -180,7 +188,7 @@ export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }
                     <div className="flex items-center">
                       <MapPin className="w-4 h-4 mr-2" />
                       {/* Deterministic room number derived from id to avoid layout thrash */}
-                      Room {(appointment.id % 10) + 1}
+                      Room {((Array.from(appointment.id).reduce((a, c) => a + c.charCodeAt(0), 0)) % 10) + 1}
                     </div>
                   </div>
                 </div>
@@ -218,10 +226,15 @@ export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Book New Session</h2>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={submitBooking}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Therapy Type</label>
-                <select className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500">
+                <select 
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                  value={selectedTherapy}
+                  onChange={(e) => setSelectedTherapy(e.target.value)}
+                  required
+                >
                   <option value="">Select therapy...</option>
                   {therapyTypes.map((therapy) => (
                     <option key={therapy.id} value={therapy.id}>{therapy.name}</option>
@@ -233,11 +246,19 @@ export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }
                 <input
                   type="date"
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Time</label>
-                <select className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500">
+                <select 
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                  value={selectedTime}
+                  onChange={(e) => setSelectedTime(e.target.value)}
+                  required
+                >
                   <option value="">Select time...</option>
                   {timeSlots.map((time) => (
                     <option key={time} value={time}>{time}</option>
@@ -250,6 +271,8 @@ export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   rows={3}
                   placeholder="Any specific needs or concerns..."
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
                 />
               </div>
               <div className="flex space-x-4 pt-4">
