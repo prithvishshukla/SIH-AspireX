@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { Dashboard } from './components/Dashboard';
@@ -7,12 +8,17 @@ import { PatientTracking } from './components/PatientTracking';
 import { NotificationCenter } from './components/NotificationCenter';
 import { Analytics } from './components/Analytics';
 import { UserProfile } from './components/UserProfile';
+import { EmergencyCenter } from './components/EmergencyCenter';
+import { VideoLibrary } from './components/VideoLibrary';
+import { CommunityForum } from './components/CommunityForum';
+import { VideoConsultation } from './components/VideoConsultation';
 import { storage } from './lib/storage';
 
-type ViewType = 'home' | 'dashboard' | 'scheduling' | 'tracking' | 'notifications' | 'analytics' | 'profile';
+type ViewType = 'home' | 'dashboard' | 'scheduling' | 'tracking' | 'notifications' | 'analytics' | 'profile' | 'emergency' | 'videoLibrary' | 'forum' | 'consultation';
 type UserRole = 'patient' | 'practitioner' | 'admin';
 
 function App() {
+  const { t } = useTranslation();
   const [currentView, setCurrentView] = useState<ViewType>(() =>
     storage.get<ViewType>('app.currentView', 'home')
   );
@@ -57,6 +63,14 @@ function App() {
         return <Analytics userRole={userRole} />;
       case 'profile':
         return <UserProfile userRole={userRole} />;
+      case 'emergency':
+        return <EmergencyCenter userRole={userRole} />;
+      case 'videoLibrary':
+        return <VideoLibrary userRole={userRole} />;
+      case 'forum':
+        return <CommunityForum userRole={userRole} />;
+      case 'consultation':
+        return <VideoConsultation userRole={userRole} />;
       default:
         return <HeroSection onGetStarted={() => setCurrentView('dashboard')} />;
     }

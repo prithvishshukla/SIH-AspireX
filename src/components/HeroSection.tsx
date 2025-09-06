@@ -1,11 +1,14 @@
 import React from 'react';
 import { Leaf, Shield, Calendar, BarChart3 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface HeroSectionProps {
 	onGetStarted: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
+	const { t } = useTranslation();
+
 	return (
 		<section className="relative overflow-hidden">
 			{/* Background gradient blob */}
@@ -18,14 +21,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
 				<div>
 					<div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium mb-4">
 						<Shield className="w-4 h-4" />
-						<span>Panchakarma Care, Reimagined</span>
+						<span>{t('navigation.panchakarmaExcellence')}</span>
 					</div>
 					<h1 className="text-4xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
-						AyurSutra
+						{t('hero.title')}
 					</h1>
 					<p className="mt-4 text-lg text-gray-600 max-w-xl">
-						A comprehensive platform to manage therapies, track wellness progress, and streamline your
-						Panchakarma journey for patients, practitioners, and admins.
+						{t('hero.subtitle')}
 					</p>
 					<div className="mt-8 flex flex-col sm:flex-row gap-3">
 						<button
@@ -33,28 +35,28 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
 							className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white bg-gradient-to-r from-emerald-600 to-teal-600 font-medium shadow-sm hover:shadow-md hover:scale-[1.01] transition"
 						>
 							<Leaf className="w-5 h-5 mr-2" />
-							Get Started
+							{t('common.getStarted')}
 						</button>
 						<a
 							href="#features"
 							className="inline-flex items-center justify-center px-6 py-3 rounded-xl border border-gray-200 text-gray-700 bg-white hover:bg-gray-50"
 						>
-							Learn More
+							{t('hero.learnMore')}
 						</a>
 					</div>
 
 					<div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
 						<div className="rounded-xl border border-emerald-100 bg-white p-4">
 							<Calendar className="w-5 h-5 text-emerald-600" />
-							<div className="mt-2 text-sm text-gray-600">Smart Scheduling</div>
+							<div className="mt-2 text-sm text-gray-600">{t('hero.smartScheduling')}</div>
 						</div>
 						<div className="rounded-xl border border-emerald-100 bg-white p-4">
 							<BarChart3 className="w-5 h-5 text-emerald-600" />
-							<div className="mt-2 text-sm text-gray-600">Progress Tracking</div>
+							<div className="mt-2 text-sm text-gray-600">{t('hero.progressTracking')}</div>
 						</div>
 						<div className="rounded-xl border border-emerald-100 bg-white p-4">
 							<Shield className="w-5 h-5 text-emerald-600" />
-							<div className="mt-2 text-sm text-gray-600">Care Guidance</div>
+							<div className="mt-2 text-sm text-gray-600">{t('hero.careGuidance')}</div>
 						</div>
 					</div>
 				</div>

@@ -1,0 +1,98 @@
+{
+  "common": {
+    "dashboard": "डैशबोर्ड",
+    "scheduling": "समय निर्धारण",
+    "tracking": "ट्रैकिंग",
+    "notifications": "सूचनाएं",
+    "analytics": "विश्लेषण",
+    "profile": "प्रोफ़ाइल",
+    "emergency": "आपातकाल",
+    "videoLibrary": "वीडियो लाइब्रेरी",
+    "forum": "सामुदायिक मंच",
+    "consultation": "वीडियो परामर्श",
+    "logout": "लॉग आउट",
+    "getStarted": "शुरू करें",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "edit": "संपादित करें",
+    "delete": "हटाएं",
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "success": "सफलता"
+  },
+  "navigation": {
+    "home": "होम",
+    "ayursutra": "आयुर्सूत्र",
+    "panchakarmaExcellence": "पंचकर्म उत्कृष्टता"
+  },
+  "hero": {
+    "title": "आयुर्सूत्र",
+    "subtitle": "चिकित्सा प्रबंधन, कल्याण प्रगति ट्रैकिंग, और पंचकर्म यात्रा को सुव्यवस्थित करने के लिए एक व्यापक मंच।",
+    "smartScheduling": "स्मार्ट शेड्यूलिंग",
+    "progressTracking": "प्रगति ट्रैकिंग",
+    "careGuidance": "देखभाल मार्गदर्शन",
+    "learnMore": "और जानें"
+  },
+  "voice": {
+    "listening": "सुन रहा है...",
+    "clickToSpeak": "बोलने के लिए क्लिक करें",
+    "voiceNotSupported": "इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है",
+    "microphoneAccess": "माइक्रोफ़ोन एक्सेस आवश्यक है"
+  },
+  "notifications": {
+    "title": "सूचनाएं",
+    "appointments": "अपॉइंटमेंट",
+    "prescriptions": "नुस्खे",
+    "emergencies": "आपातकाल",
+    "forum": "मंच",
+    "markAllRead": "सभी को पढ़ा हुआ चिह्नित करें",
+    "noNotifications": "कोई सूचना नहीं"
+  },
+  "emergency": {
+    "title": "आपातकालीन केंद्र",
+    "subtitle": "24/7 आपातकालीन सहायता और घटना ट्रैकिंग",
+    "reportEmergency": "आपातकाल की रिपोर्ट करें",
+    "status": {
+      "open": "खुला",
+      "inProgress": "प्रगति में",
+      "resolved": "हल हो गया"
+    },
+    "priority": {
+      "low": "कम",
+      "medium": "मध्यम",
+      "high": "उच्च",
+      "critical": "गंभीर"
+    }
+  },
+  "videoLibrary": {
+    "title": "वीडियो लाइब्रेरी",
+    "subtitle": "आपकी कल्याण यात्रा के लिए शैक्षिक सामग्री",
+    "exercise": "व्यायाम",
+    "awareness": "जागरूकता",
+    "diet": "आहार",
+    "transcript": "प्रतिलेख",
+    "quality": "गुणवत्ता"
+  },
+  "forum": {
+    "title": "सामुदायिक मंच",
+    "subtitle": "अपनी कल्याण यात्रा पर दूसरों से जुड़ें",
+    "newThread": "नया थ्रेड",
+    "reply": "उत्तर दें",
+    "doctorVerified": "डॉक्टर सत्यापित",
+    "replies": "उत्तर",
+    "views": "दृश्य"
+  },
+  "consultation": {
+    "title": "वीडियो परामर्श",
+    "subtitle": "अपने चिकित्सक से दूर से जुड़ें",
+    "startCall": "कॉल शुरू करें",
+    "endCall": "कॉल समाप्त करें",
+    "toggleMic": "माइक्रोफ़ोन टॉगल करें",
+    "toggleCamera": "कैमरा टॉगल करें",
+    "shareFile": "फ़ाइल साझा करें",
+    "chat": "चैट",
+    "duration": "अवधि"
+  }
+}

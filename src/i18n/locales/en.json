@@ -1,0 +1,98 @@
+{
+  "common": {
+    "dashboard": "Dashboard",
+    "scheduling": "Scheduling",
+    "tracking": "Tracking",
+    "notifications": "Notifications",
+    "analytics": "Analytics",
+    "profile": "Profile",
+    "emergency": "Emergency",
+    "videoLibrary": "Video Library",
+    "forum": "Community Forum",
+    "consultation": "Video Consultation",
+    "logout": "Logout",
+    "getStarted": "Get Started",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "navigation": {
+    "home": "Home",
+    "ayursutra": "AyurSutra",
+    "panchakarmaExcellence": "Panchakarma Excellence"
+  },
+  "hero": {
+    "title": "AyurSutra",
+    "subtitle": "A comprehensive platform to manage therapies, track wellness progress, and streamline your Panchakarma journey for patients, practitioners, and admins.",
+    "smartScheduling": "Smart Scheduling",
+    "progressTracking": "Progress Tracking",
+    "careGuidance": "Care Guidance",
+    "learnMore": "Learn More"
+  },
+  "voice": {
+    "listening": "Listening...",
+    "clickToSpeak": "Click to speak",
+    "voiceNotSupported": "Voice input not supported in this browser",
+    "microphoneAccess": "Microphone access required"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "appointments": "Appointments",
+    "prescriptions": "Prescriptions",
+    "emergencies": "Emergencies",
+    "forum": "Forum",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No notifications"
+  },
+  "emergency": {
+    "title": "Emergency Center",
+    "subtitle": "24/7 emergency support and incident tracking",
+    "reportEmergency": "Report Emergency",
+    "status": {
+      "open": "Open",
+      "inProgress": "In Progress",
+      "resolved": "Resolved"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    }
+  },
+  "videoLibrary": {
+    "title": "Video Library",
+    "subtitle": "Educational content for your wellness journey",
+    "exercise": "Exercise",
+    "awareness": "Awareness",
+    "diet": "Diet",
+    "transcript": "Transcript",
+    "quality": "Quality"
+  },
+  "forum": {
+    "title": "Community Forum",
+    "subtitle": "Connect with others on their wellness journey",
+    "newThread": "New Thread",
+    "reply": "Reply",
+    "doctorVerified": "Doctor Verified",
+    "replies": "replies",
+    "views": "views"
+  },
+  "consultation": {
+    "title": "Video Consultation",
+    "subtitle": "Connect with your practitioner remotely",
+    "startCall": "Start Call",
+    "endCall": "End Call",
+    "toggleMic": "Toggle Microphone",
+    "toggleCamera": "Toggle Camera",
+    "shareFile": "Share File",
+    "chat": "Chat",
+    "duration": "Duration"
+  }
+}

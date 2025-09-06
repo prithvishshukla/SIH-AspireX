@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Calendar, Clock, User, MapPin, Plus, Filter, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { VoiceInput } from './VoiceInput';
 import { bookingService, type Booking } from '../services/bookings';
 
 interface TherapySchedulingProps {
@@ -7,11 +9,13 @@ interface TherapySchedulingProps {
 }
 
 export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }) => {
+  const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedTherapy, setSelectedTherapy] = useState('');
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [note, setNote] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const therapyTypes = [
     { id: 'abhyanga', name: 'Abhyanga Massage', duration: '90 min', price: '₹3,500' },
@@ -55,12 +59,16 @@ export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }
     if (typeof window !== 'undefined') window.location.reload();
   };
 
+  const handleVoiceSearch = (transcript: string) => {
+    setSearchQuery(transcript);
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Therapy Scheduling</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t('common.scheduling')}</h1>
           <p className="text-gray-600">
             {userRole === 'patient' 
               ? 'Book and manage your Panchakarma therapy sessions' 
@@ -87,9 +95,14 @@ export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Search therapies or practitioners..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t('common.search') + ' therapies or practitioners...'}
                   className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <VoiceInput onResult={handleVoiceSearch} size="sm" />
+                </div>
               </div>
               <div className="flex space-x-2">
                 <select className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500">
@@ -281,7 +294,7 @@ export const TherapyScheduling: React.FC<TherapySchedulingProps> = ({ userRole }
                   onClick={() => setShowBookingModal(false)}
                   className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
